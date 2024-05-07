@@ -19,7 +19,10 @@ set mainPkg=.\mg
 set archive=%projet%.jar
 
 javac -d %dossier_temp% %src%
+cd %dossier_temp%
 jar -cf %archive% .\mg
+cd ..
+xcopy "temp\%archive%" "%dossier_principal%" /y
 
 @REM Command to copy the jar to Test librairie
 @REM set destination=..\Test\lib
