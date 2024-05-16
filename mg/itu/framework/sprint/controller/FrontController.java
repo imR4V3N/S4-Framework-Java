@@ -28,10 +28,7 @@ public class FrontController  extends HttpServlet{
         this.classController = classController;
     }
 
-    public void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException{
-        PrintWriter out = response.getWriter();
-        out.println("URL : " + request.getRequestURI());
-
+    public void showController(PrintWriter out) throws IOException{
         ArrayList<Class<?>> classes = new ArrayList<>();
         if (classes != null) {
             classes = this.getClassController();
@@ -41,6 +38,12 @@ public class FrontController  extends HttpServlet{
                 out.println("- " + classe.getSimpleName());
             }
         }
+    }
+
+    public void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException{
+        PrintWriter out = response.getWriter();
+        out.println("URL : " + request.getRequestURI());
+        this.showController(out);
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException{
