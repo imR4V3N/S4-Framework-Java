@@ -1,21 +1,30 @@
 package mg.itu.framework.sprint.controller;
 
-import jakarta.servlet.ServletException;
+// import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import mg.itu.framework.sprint.utils.CheckController;
+import mg.itu.framework.sprint.utils.Utils;
 
 public class FrontController  extends HttpServlet{
     private ArrayList<Class<?>> classController;
-    
-    public void init() throws ServletException{
+    private boolean checked = false;
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
+    }
+
+    public void initValue() {
         try {
             String packageCtrl = this.getInitParameter("packageName");
-            this.setClassController(CheckController.getControllerClasses(packageCtrl));
+            this.setClassController(Utils.getControllerClasses(packageCtrl));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -43,6 +52,10 @@ public class FrontController  extends HttpServlet{
     public void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException{
         PrintWriter out = response.getWriter();
         out.println("URL : " + request.getRequestURI());
+        if (!isChecked()) {
+            this.initValue();
+            this.setChecked(true);
+        }
         this.showController(out);
     }
 
