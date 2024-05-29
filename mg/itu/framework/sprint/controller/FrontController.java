@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import mg.itu.framework.sprint.utils.Mapping;
 import mg.itu.framework.sprint.utils.ServletManager;
+import mg.itu.framework.sprint.utils.Utils;
 
 public class FrontController  extends HttpServlet{
     private ArrayList<Class<?>> classController = new ArrayList<>();
@@ -43,10 +44,7 @@ public class FrontController  extends HttpServlet{
     public void init() throws ServletException{
         this.initController();
         try {
-            HashMap<String,Mapping> map = ServletManager.getControllerMethod(this.getClassController(),this.getControllerAndMethod());
-            if (map == null) {
-                throw new Exception("Duplicate annotation in multiple methods!");
-            }
+            ServletManager.getControllerMethod(this.getClassController(),this.getControllerAndMethod());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -74,15 +72,40 @@ public class FrontController  extends HttpServlet{
                 out.println("No method found!");
             }
         } catch (Exception e) {
-            out.println(e.getMessage());
+            out.println("Error : " + e.getMessage());
         }
     }
+
+    public void executeMethodController(PrintWriter out, String url) throws IOException {
+        String packageCtrl = this.getInitParameter("packageName");
+        Mapping map = ServletManager.getUrl(this.getControllerAndMethod(), url);
+        try {
+            if (map != null) {
+                String className = map.getClassName();
+                String methodName = map.getMethodName();
+                String classPath = packageCtrl+"."+className;
+
+                Class<?> controllerClass = Class.forName(classPath);
+                Object ctrlObj = controllerClass.newInstance(); 
+                String methodReturn =  (String) Utils.executeSimpleMethod(ctrlObj, methodName);
+                
+                out.print("After executing the "+ methodName +" method in the "+ className +" Class, this method returned the value: ");
+                out.println(methodReturn); 
+
+            } else {
+                out.println("No method found!");
+            }
+        } catch (Exception e) {
+            out.println("Error : " + e.getMessage());
+        }
+    } 
 
     public void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException{
         PrintWriter out = response.getWriter();
         String url =  request.getRequestURI();
         out.println("URL : " + url);
         this.showControllerAndMethod(out,url);
+        this.executeMethodController(out, url);
     }
 
     @Override
