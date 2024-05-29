@@ -37,8 +37,8 @@ Creation d'une annotation GET pour annoter les méthodes dans les contrôleurs
 
 Creation d'une classe Mapping qui aura pour attributs :
 
-*  String className
-*  String methodName
+* String className
+* String methodName
 
 Dans FrontController :
 
@@ -56,3 +56,19 @@ Dans FrontController :
   - Prendre le Mapping associé au chemin URL de la requête
   - Si on trouve le Mapping associé, afficher le chemin URL et le Mapping
   - Sinon, afficher qu'il n'y a pas de méthode associée à ce chemin
+
+## Sprint 3
+
+**Objectif :**
+
+Exécuter la méthode de la classe associée à une URL donnée
+
+**Étapes :**
+
+* Dans le FrontController ( ProcessRequest ): Si on trouve le Mapping associé à l'URL ,
+
+  * Récupérer la classe par son nom
+
+  - Récupérer la méthode par son nom
+  - Invoquer la méthode sur l'instance de la classe
+  - Afficher la valeur retournée par la méhode

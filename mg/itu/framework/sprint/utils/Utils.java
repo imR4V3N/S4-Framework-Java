@@ -43,5 +43,7 @@ public class Utils {
         return result;
     }
 
-    
+    public static Object executeSimpleMethod(Object obj, String methodName) throws Exception {
+        return obj.getClass().getMethod(methodName).invoke(obj);
+    }
 }
