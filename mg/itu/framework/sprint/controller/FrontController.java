@@ -104,7 +104,6 @@ public class FrontController  extends HttpServlet{
         PrintWriter out = response.getWriter();
         String url =  request.getRequestURI();
         out.println("URL : " + url);
-        this.showControllerAndMethod(out,url);
         this.executeMethodController(out, url);
     }
 
