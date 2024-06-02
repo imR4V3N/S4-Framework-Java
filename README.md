@@ -72,3 +72,23 @@ Exécuter la méthode de la classe associée à une URL donnée
   - Récupérer la méthode par son nom
   - Invoquer la méthode sur l'instance de la classe
   - Afficher la valeur retournée par la méhode
+
+## Sprint 4
+
+**Objectif:**
+
+Envoyer des données du controller vers view
+
+**Etapes:**
+
+* Côté Framework
+  * Création d'une classe ModelView qui aura pour attributs:
+    * String url : url de destination après l'exécution de la méthode
+    * HashMap<String : nom de la variable, Object: sa valeur> data : donnée à envoyer vers cette view
+      * Création d'une methode"addData" qui a comme type de retour void pour pouvoir mettre les données dans HashMap
+  * Dans FrontController
+    * Dans la methode processRequest, récupération des données issues de la méthode annotée Get
+      * si les data sont de type string, retour la valeur directement
+      * si les données sont de type ModelView, récupération le url et dispatcher les données vers cet url
+        * Boucle de data pour mettre y faire request.setAttribute et Dispatcher dans l'url (view)
+      * si autre, retourner "methode de retour non reconnu"
