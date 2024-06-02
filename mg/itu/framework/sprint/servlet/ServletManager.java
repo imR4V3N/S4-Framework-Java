@@ -1,4 +1,4 @@
-package mg.itu.framework.sprint.utils;
+package mg.itu.framework.sprint.servlet;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import mg.itu.framework.sprint.annotation.Controller;
 import mg.itu.framework.sprint.annotation.Get;
+import mg.itu.framework.sprint.utils.Utils;
+import mg.itu.framework.sprint.utils.Mapping;
+
 
 public class ServletManager {
     public static ArrayList<Class<?>> getControllerClasses(String packageName) throws ClassNotFoundException, IOException {
@@ -24,7 +27,7 @@ public class ServletManager {
     public static void getControllerMethod(ArrayList<Class<?>> classes,HashMap<String,Mapping> controllerAndMethod) throws Exception {
         if (classes != null) {
             for(Class<?> classe : classes) {
-                ArrayList<Method> methods = Utils.getClassMethod(classe);
+                ArrayList<Method> methods = Utils.getListMethod(classe);
                 for (Method method : methods) {
                     if (method.isAnnotationPresent(Get.class)) {
                         String url = ((Get) method.getAnnotation(Get.class)).value();

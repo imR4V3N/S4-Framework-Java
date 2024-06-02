@@ -1,15 +1,20 @@
 package mg.itu.framework.sprint.controller;
 
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+
 import mg.itu.framework.sprint.utils.Mapping;
-import mg.itu.framework.sprint.utils.ServletManager;
+import mg.itu.framework.sprint.servlet.ServletManager;
+import mg.itu.framework.sprint.servlet.ModelView;
 import mg.itu.framework.sprint.utils.Utils;
 
 public class FrontController  extends HttpServlet{
@@ -50,7 +55,7 @@ public class FrontController  extends HttpServlet{
         }
     }
 
-    public void showController(PrintWriter out) throws IOException{
+    public void showController(PrintWriter out) {
         ArrayList<Class<?>> classes = new ArrayList<>();
         if (classes != null && this.getClassController() != null && !this.getClassController().isEmpty()) {
             classes = this.getClassController();
@@ -62,7 +67,7 @@ public class FrontController  extends HttpServlet{
         }
     }
 
-    public void showControllerAndMethod(PrintWriter out, String url) throws IOException{
+    public void showControllerAndMethod(PrintWriter out, String url){
         Mapping map = ServletManager.getUrl(this.getControllerAndMethod(), url);
         try {
             if (map != null) {
@@ -76,7 +81,19 @@ public class FrontController  extends HttpServlet{
         }
     }
 
-    public void executeMethodController(PrintWriter out, String url) throws IOException {
+    public void dispatchModelView(ModelView modelView, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        for (Map.Entry<String,Object> data : modelView.getData().entrySet()){
+            String varName = data.getKey();
+            Object varValue = data.getValue();
+            request.setAttribute(varName,varValue);
+        }
+        RequestDispatcher dispatcher = request.getServletContext().getRequestDispatcher("/"+modelView.getUrl());
+        dispatcher.forward(request,response);
+    }
+
+    public void executeMethodController(String url, HttpServletRequest request, HttpServletResponse response) throws IOException , ServletException {
+        PrintWriter out = response.getWriter();
+        
         String packageCtrl = this.getInitParameter("packageName");
         Mapping map = ServletManager.getUrl(this.getControllerAndMethod(), url);
         try {
@@ -86,11 +103,24 @@ public class FrontController  extends HttpServlet{
                 String classPath = packageCtrl+"."+className;
 
                 Class<?> controllerClass = Class.forName(classPath);
-                Object ctrlObj = controllerClass.newInstance(); 
-                String methodReturn =  (String) Utils.executeSimpleMethod(ctrlObj, methodName);
-                
-                out.print("After executing the "+ methodName +" method in the "+ className +" Class, this method returned the value: ");
-                out.println(methodReturn); 
+                Method controllerMethod = Utils.getMethod(controllerClass, methodName);
+
+                if (controllerMethod.getReturnType() == String.class || controllerMethod.getReturnType() == ModelView.class) {
+                    Object ctrlObj = controllerClass.newInstance(); 
+                    out.println("Return: "+ controllerMethod.getReturnType());
+                    if (controllerMethod.getReturnType() == String.class) {
+                        String methodReturn =  (String) Utils.executeSimpleMethod(ctrlObj, methodName);
+                    
+                        out.print("After executing the "+ methodName +" method in the "+ className +".class, this method returned the value: ");
+                        out.println(methodReturn);
+                    } 
+                    if (controllerMethod.getReturnType() == ModelView.class) {
+                        ModelView modelView = (ModelView) Utils.executeSimpleMethod(ctrlObj, methodName);
+                        this.dispatchModelView(modelView, request, response);
+                    }
+                } else {
+                    out.println("The return type of method "+ methodName + " in " + className + ".class is invalid!" );
+                }
 
             } else {
                 out.println("No method found!");
@@ -98,21 +128,21 @@ public class FrontController  extends HttpServlet{
         } catch (Exception e) {
             out.println("Error : " + e.getMessage());
         }
-    } 
+    }
 
-    public void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException{
+    public void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
         PrintWriter out = response.getWriter();
         String url =  request.getRequestURI();
         out.println("URL : " + url);
-        this.executeMethodController(out, url);
+        this.executeMethodController(url, request, response);
     }
 
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException{
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
         this.processRequest(request,response);
     }
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException{
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
         this.processRequest(request,response);
     }
 }
