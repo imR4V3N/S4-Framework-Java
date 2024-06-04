@@ -24,23 +24,26 @@ public class ServletManager {
         return result;
     }
 
-    public static void getControllerMethod(ArrayList<Class<?>> classes,HashMap<String,Mapping> controllerAndMethod) throws Exception {
+    public static HashMap<String,Mapping> getControllerMethod(ArrayList<Class<?>> classes) throws Exception {
+        HashMap<String,Mapping> result = new HashMap<>();
         if (classes != null) {
             for(Class<?> classe : classes) {
                 ArrayList<Method> methods = Utils.getListMethod(classe);
                 for (Method method : methods) {
                     if (method.isAnnotationPresent(Get.class)) {
                         String url = ((Get) method.getAnnotation(Get.class)).value();
-                        if (controllerAndMethod.get(url)==null) {
+                        if (result.get(url)==null) {
                             Mapping mapping = new Mapping(classe.getSimpleName(),method.getName());
-                            controllerAndMethod.put(url, mapping);
+                            result.put(url, mapping);
                         } else {
-                            throw new Exception("Duplicate annotation : "+ url +" in multiple methods!");
+                            // throw new Exception("Duplicate annotation : "+ url +" in multiple methods!");
+                            return null;
                         }
                     }
                 }
             }
         }
+        return result;
     }
 
     public static Mapping getUrl(HashMap<String, Mapping> maps, String url) {

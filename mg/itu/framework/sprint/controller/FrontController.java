@@ -11,12 +11,12 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import mg.itu.framework.sprint.utils.Mapping;
 import mg.itu.framework.sprint.servlet.ServletManager;
 import mg.itu.framework.sprint.servlet.ModelView;
 import mg.itu.framework.sprint.utils.Utils;
 
+@SuppressWarnings("deprecation")
 public class FrontController  extends HttpServlet{
     private ArrayList<Class<?>> classController = new ArrayList<>();
     private HashMap<String,Mapping> controllerAndMethod = new HashMap<>(); 
@@ -47,11 +47,22 @@ public class FrontController  extends HttpServlet{
     }
 
     public void init() throws ServletException{
+        String packageCtrl = this.getInitParameter("packageName");
         this.initController();
         try {
-            ServletManager.getControllerMethod(this.getClassController(),this.getControllerAndMethod());
+            HashMap<String,Mapping> map = ServletManager.getControllerMethod(this.getClassController());
+            
+            if (map != null) {
+                this.setControllerAndMethod(map);
+            }
+            if (map == null) {
+                throw new Exception("Duplicate annotation in multiple methods!");
+            }
+            if (this.getClassController().size() == 0) {   
+                throw new Exception("The package " + packageCtrl + " is empty or doesn't exist!");
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -74,7 +85,7 @@ public class FrontController  extends HttpServlet{
                 out.println("Controller Name : " + map.getClassName());
                 out.println("Method Name : " + map.getMethodName());
             } else {
-                out.println("No method found!");
+                out.println("Error 404 not found!");
             }
         } catch (Exception e) {
             out.println("Error : " + e.getMessage());
@@ -96,18 +107,19 @@ public class FrontController  extends HttpServlet{
         
         String packageCtrl = this.getInitParameter("packageName");
         Mapping map = ServletManager.getUrl(this.getControllerAndMethod(), url);
+
         try {
             if (map != null) {
                 String className = map.getClassName();
                 String methodName = map.getMethodName();
                 String classPath = packageCtrl+"."+className;
-
+                
                 Class<?> controllerClass = Class.forName(classPath);
                 Method controllerMethod = Utils.getMethod(controllerClass, methodName);
 
                 if (controllerMethod.getReturnType() == String.class || controllerMethod.getReturnType() == ModelView.class) {
                     Object ctrlObj = controllerClass.newInstance(); 
-                    out.println("Return: "+ controllerMethod.getReturnType());
+                    
                     if (controllerMethod.getReturnType() == String.class) {
                         String methodReturn =  (String) Utils.executeSimpleMethod(ctrlObj, methodName);
                     
@@ -121,9 +133,8 @@ public class FrontController  extends HttpServlet{
                 } else {
                     out.println("The return type of method "+ methodName + " in " + className + ".class is invalid!" );
                 }
-
             } else {
-                out.println("No method found!");
+                out.println("Error 404 not found!");
             }
         } catch (Exception e) {
             out.println("Error : " + e.getMessage());
