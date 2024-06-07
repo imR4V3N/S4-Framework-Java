@@ -85,7 +85,7 @@ public class FrontController  extends HttpServlet{
                 out.println("Controller Name : " + map.getClassName());
                 out.println("Method Name : " + map.getMethodName());
             } else {
-                out.println("Error 404 not found!");
+                throw new Exception("Error 404 not found!");
             }
         } catch (Exception e) {
             out.println("Error : " + e.getMessage());
@@ -131,10 +131,10 @@ public class FrontController  extends HttpServlet{
                         this.dispatchModelView(modelView, request, response);
                     }
                 } else {
-                    out.println("The return type of method "+ methodName + " in " + className + ".class is invalid!" );
+                    throw new Exception("The return type of method "+ methodName + " in " + className + ".class is invalid!" );
                 }
             } else {
-                out.println("Error 404 not found!");
+                throw new Exception("Error 404 not found!");
             }
         } catch (Exception e) {
             out.println("Error : " + e.getMessage());
