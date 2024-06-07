@@ -1,26 +1,37 @@
 package mg.itu.framework.sprint.servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import mg.itu.framework.sprint.annotation.Controller;
 import mg.itu.framework.sprint.annotation.Get;
 import mg.itu.framework.sprint.utils.Utils;
 import mg.itu.framework.sprint.utils.Mapping;
+import mg.itu.framework.sprint.exception.*;
 
 
+@SuppressWarnings("deprecation")
 public class ServletManager {
-    public static ArrayList<Class<?>> getControllerClasses(String packageName) throws ClassNotFoundException, IOException {
+    public static ArrayList<Class<?>> getControllerClasses(String packageName) throws Exception {
         ArrayList<Class<?>> classes = Utils.getClasses(packageName);
         ArrayList<Class<?>> result = new ArrayList<Class<?>>();
         
         for(Class<?> classe : classes) {
             if (classe.isAnnotationPresent(Controller.class)) {
                 result.add(classe);
-            }
+            } 
         }
-
+        if (result.size() <= 0) {
+            throw new PackageException(packageName);
+        }
         return result;
     }
 
@@ -36,8 +47,7 @@ public class ServletManager {
                             Mapping mapping = new Mapping(classe.getSimpleName(),method.getName());
                             result.put(url, mapping);
                         } else {
-                            // throw new Exception("Duplicate annotation : "+ url +" in multiple methods!");
-                            return null;
+                            throw new DuplicateException();
                         }
                     }
                 }
@@ -46,7 +56,7 @@ public class ServletManager {
         return result;
     }
 
-    public static Mapping getUrl(HashMap<String, Mapping> maps, String url) {
+    public static Mapping getUrl(HashMap<String, Mapping> maps, String url) throws Exception {
         Mapping result = null;
         String[] path = url.split("/");
         String newUrl = new String();
@@ -61,7 +71,49 @@ public class ServletManager {
             if (map != null) {
                 result = map;
             }
+        } 
+        if (result == null) {
+            throw new UrlNotFoundException();
         }
         return result;
+    }
+
+    public static void executeMethodController(String url, HttpServletRequest request, HttpServletResponse response, String packageName, HashMap<String,Mapping> controllerAndMethod) throws Exception {
+        PrintWriter out = response.getWriter();        
+        Mapping map = ServletManager.getUrl(controllerAndMethod, url);
+
+        String className = map.getClassName();
+        String methodName = map.getMethodName();
+        String classPath = packageName+"."+className;
+        
+        Class<?> controllerClass = Class.forName(classPath);
+        Method controllerMethod = Utils.getMethod(controllerClass, methodName);
+
+        if (controllerMethod.getReturnType() == String.class || controllerMethod.getReturnType() == ModelView.class) {
+            Object ctrlObj = controllerClass.newInstance(); 
+            
+            if (controllerMethod.getReturnType() == String.class) {
+                String methodReturn =  (String) Utils.executeSimpleMethod(ctrlObj, methodName);
+            
+                out.print("After executing the "+ methodName +" method in the "+ className +".class, this method returned the value: ");
+                out.println(methodReturn);
+            } 
+            if (controllerMethod.getReturnType() == ModelView.class) {
+                ModelView modelView = (ModelView) Utils.executeSimpleMethod(ctrlObj, methodName);
+                dispatchModelView(modelView, request, response);
+            }
+        } else {
+            throw new ReturnException(methodName, className);
+        }
+    }
+
+    public static void dispatchModelView(ModelView modelView, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        for (Map.Entry<String,Object> data : modelView.getData().entrySet()){
+            String varName = data.getKey();
+            Object varValue = data.getValue();
+            request.setAttribute(varName,varValue);
+        }
+        RequestDispatcher dispatcher = request.getServletContext().getRequestDispatcher("/"+modelView.getUrl());
+        dispatcher.forward(request,response);
     }
 }
