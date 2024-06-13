@@ -93,7 +93,7 @@ Envoyer des données du controller vers view
         * Boucle de data pour mettre y faire request.setAttribute et Dispatcher dans l'url (view)
       * si autre, retourner "methode de retour non reconnu"
 
-# Sprint 5
+## Sprint 5
 
 ### Objectif:
 
@@ -107,3 +107,22 @@ Gestion d'exception
 * **Process**
   * Exception "Error  404 not found" si l'url n'existe pas alors on ecrit sur la page
   * Exception si le type de retour du methode de la classe controller n'est pas un String ou un ModelView
+
+
+
+## Sprint 6
+
+### Objectif:
+
+Envoyer des donnees du view vers controller
+
+### Etapes:
+
+* Creation d'une annotation RequestParam pour annoter les attrubuts d'une methode dans un controller
+* Dans FrontController
+  * Comparaison si le nom du parametre du formulaire correspond a l'anotation du parametre de methode correspondant a l'url
+    * Si oui, assignation de la valeur du parametre du formulaire dans le parametre de la methode
+      * Si la method retourne un String alors excecution la methode
+      * Si c'est ModelView alors dispatch des donnees dans le view correspondant a l'url designe par ModelView
+      * Sinon type de retour invalide
+    * Si nombre de parametre du formulaire different du nombre de parametre du methode alors Exception de parametre insuffisant

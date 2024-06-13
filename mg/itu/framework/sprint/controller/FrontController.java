@@ -75,6 +75,19 @@ public class FrontController  extends HttpServlet{
         }
     }
 
+    public void processExecuteMethod(String url, String packageCtrl, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
+        PrintWriter out = response.getWriter();
+        try {
+            Mapping map = ServletManager.getUrl(this.getControllerAndMethod(), url);
+            out.println("Controller Name : " + map.getClassName());
+            out.println("Method Name : " + map.getMethodName());
+            ServletManager.executeMethod(packageCtrl, map, request, response);
+
+        } catch (Exception e) {
+            out.println("Error : " + e.getMessage());
+        }
+    }
+
     public void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
         PrintWriter out = response.getWriter();
         String packageCtrl = this.getInitParameter("packageName");
@@ -82,7 +95,7 @@ public class FrontController  extends HttpServlet{
         out.println("URL : " + url);
 
         try {
-            ServletManager.executeMethodController(url, request, response, packageCtrl, this.getControllerAndMethod());
+            this.processExecuteMethod(url, packageCtrl, request, response);
         } catch (Exception e) {
             out.println("Error : " + e.getMessage());
         }
