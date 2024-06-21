@@ -108,8 +108,6 @@ Gestion d'exception
   * Exception "Error  404 not found" si l'url n'existe pas alors on ecrit sur la page
   * Exception si le type de retour du methode de la classe controller n'est pas un String ou un ModelView
 
-
-
 ## Sprint 6
 
 ### Objectif:
@@ -126,3 +124,19 @@ Envoyer des donnees du view vers controller
       * Si c'est ModelView alors dispatch des donnees dans le view correspondant a l'url designe par ModelView
       * Sinon type de retour invalide
     * Si nombre de parametre du formulaire different du nombre de parametre du methode alors Exception de parametre insuffisant
+  * Si jamais l'utilisateur du framework n'avais pas annoté ses paramètres d'utilisé le nom des paramètres en question.
+    * Pour recuperer le nom des parametres, on utilisera une librairie externe paranamer de Throughwork: [paranamer-2.8](https://mvnrepository.com/.../com.../paranamer/2.8)
+    * Et ajouter **-g** comme option a la compilation du projet
+
+## Sprint 7
+
+**Objectif:**
+
+Permettre de mettre en paramètre d'une fonction de mapping un objet et de setup ses attributs.
+
+**Etapes:**
+
+1. Créer une annotation pour l'objet en paramètre
+2. Créer un process qui va s'effectuer automatiquement lors que le programme détecte l'annotation créée plus tôt
+   * Ce process va bouclé tous les attributs de l'objet pour obtenir leurs valeurs attribuées dans request.getParameter
+   * Créer une nouvelle annotation de type ElementType.FIELD pour donner le choix aux utilisateurs du framework le choix entre utilisé le même nom dans sa classe et son formulaire ou annoté l'attribut avec le nom présent dans son formulaire sans devoir à utilisé le même nom
