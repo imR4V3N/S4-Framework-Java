@@ -85,7 +85,7 @@ public class Utils {
         return true;
     }
 
-    public static Object castValue(String value,Class<?> clazz) throws Exception{
+    public static Object castValue(String value, Class<?> clazz) throws Exception{
         Object result = null;
         if(clazz == String.class){
             result = value;
