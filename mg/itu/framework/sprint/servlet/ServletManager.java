@@ -90,7 +90,7 @@ public class ServletManager {
 
         String className = map.getClassName();
         String methodName = map.getMethodName();
-        String classPath = packageName+"."+className;
+        String classPath = packageName + "." + className;
         
         Class<?> controllerClass = Class.forName(classPath);
         Method controllerMethod = Utils.getMethod(controllerClass, methodName);
@@ -132,9 +132,11 @@ public class ServletManager {
         if (method.getReturnType() == String.class || method.getReturnType() == ModelView.class){
             Object object = clazz.newInstance();
             List<Object> MethodParameters = new ArrayList<>();
+
             if (method.getParameters().length > 0) {
                 MethodParameters = preparedParameter(object, method,request,response);
-                if (MethodParameters.size() != method.getParameters().length){
+
+                if (MethodParameters.size() != method.getParameters().length) {
                     throw new Exception("Parameters number is insufficient!");
                 }
             }
@@ -147,7 +149,7 @@ public class ServletManager {
         }
 
         else {
-            throw new Exception("The return type of the method "+ method.getName() +" in "+clazz.getName()+".class is invalid!");
+            throw new Exception("The return type of the method " + method.getName() + " in " + clazz.getName() + ".class is invalid!");
         }
     }
 
@@ -158,18 +160,24 @@ public class ServletManager {
 
         for (int i = 0 ; i < parameters.length; i++){
             Annotation argumentAnnotation = parameters[i].getAnnotation(RequestParam.class);
-            String arguentName = parameterName[i];
+            String argumentName = parameterName[i];
             if (argumentAnnotation != null){
-                arguentName = ((RequestParam) argumentAnnotation).value();
-            }
+                argumentName = ((RequestParam) argumentAnnotation).value();
+            } 
+            
             Class<?> clazz = parameters[i].getType();
-            if (Utils.isObject(clazz)){
-                Object o = clazz.newInstance();
-                result.add(prepareObject(arguentName,o,request));
+
+            if(clazz == Session.class){
+                Session session = new Session(request.getSession());
+                result.add(session);
             }
-            else {
-                if(request.getParameter(arguentName)!=null){
-                    result.add(Utils.castValue(request.getParameter(arguentName),parameters[i].getType()));
+            if (Utils.isObject(clazz) && clazz != Session.class){
+                Object o = clazz.newInstance();
+                result.add(prepareObject(argumentName,o,request));
+            }
+            if (!Utils.isObject(clazz)) {
+                if(request.getParameter(argumentName)!=null){
+                    result.add(Utils.castValue(request.getParameter(argumentName),parameters[i].getType()));
                 }
             }
         }
@@ -183,7 +191,7 @@ public class ServletManager {
         return  parameterName;
     }
 
-    public static Object prepareObject (String name,Object obj, HttpServletRequest request) throws Exception {
+    public static Object prepareObject (String name, Object obj, HttpServletRequest request) throws Exception {
         Field[] attributs = obj.getClass().getDeclaredFields();
         for (Field attr : attributs){
             String method_name = "set"+Utils.toUpperCase(attr.getName());

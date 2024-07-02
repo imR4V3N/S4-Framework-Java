@@ -140,3 +140,20 @@ Permettre de mettre en paramètre d'une fonction de mapping un objet et de setup
 2. Créer un process qui va s'effectuer automatiquement lors que le programme détecte l'annotation créée plus tôt
    * Ce process va bouclé tous les attributs de l'objet pour obtenir leurs valeurs attribuées dans request.getParameter
    * Créer une nouvelle annotation de type ElementType.FIELD pour donner le choix aux utilisateurs du framework le choix entre utilisé le même nom dans sa classe et son formulaire ou annoté l'attribut avec le nom présent dans son formulaire sans devoir à utilisé le même nom
+
+## Sprint 8
+
+**Objectif :**
+
+Gestion et utilisation de session
+
+**Etapes :**
+
+* Étape 1:
+
+  * Créer une classe MySession ayant comme seul attribut HttpSession session
+
+  - Ajouter fonctions get(String key), add(String key, Object objet), delete(String key)
+* Étape 2 :
+
+  * A l'appel des méthodes des controllers de l’utilisateur, pendant la génération des arguments, vérifier si le paramètre est de type MySession et dans ce cas, créer un MySession avec req.getSession()
