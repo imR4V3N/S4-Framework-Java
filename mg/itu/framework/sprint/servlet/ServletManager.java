@@ -84,6 +84,21 @@ public class ServletManager {
         return result;
     }
 
+    public static void addSession(Object object, HttpServletRequest request) throws Exception {
+        Field[] fields = object.getClass().getDeclaredFields();
+
+        for (Field field : fields) {
+            if (field.getType() == Session.class) {
+                String parameterName = "set" + Utils.toUpperCase(field.getName());
+                Session session = new Session(request.getSession());
+                Object[] parameters = new Object[1];
+                parameters[0] = session;
+                object.getClass().getDeclaredMethod(parameterName, Session.class).invoke(object, session);
+                break;
+            }
+        }
+    }
+
     public static void executeMethodController(String url, HttpServletRequest request, HttpServletResponse response, String packageName, HashMap<String,Mapping> controllerAndMethod) throws Exception {
         PrintWriter out = response.getWriter();        
         Mapping map = ServletManager.getUrl(controllerAndMethod, url);
@@ -127,10 +142,11 @@ public class ServletManager {
         PrintWriter out = response.getWriter();
         
         Class<?> clazz = Class.forName(packageCtrl+"."+map.getClassName());
-        Method method= Utils.getMethodAnnotedGet(clazz,map.getMethodName());
+        Method method = Utils.getMethodAnnotedGet(clazz,map.getMethodName());
+        Object object = clazz.newInstance();
+        addSession(object, request);
         
         if (method.getReturnType() == String.class || method.getReturnType() == ModelView.class){
-            Object object = clazz.newInstance();
             List<Object> MethodParameters = new ArrayList<>();
 
             if (method.getParameters().length > 0) {
