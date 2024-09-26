@@ -130,11 +130,11 @@ Envoyer des donnees du view vers controller
 
 ## Sprint 7
 
-**Objectif:**
+### **Objectif:**
 
 Permettre de mettre en paramètre d'une fonction de mapping un objet et de setup ses attributs.
 
-**Etapes:**
+### **Etapes:**
 
 1. Créer une annotation pour l'objet en paramètre
 2. Créer un process qui va s'effectuer automatiquement lors que le programme détecte l'annotation créée plus tôt
@@ -143,11 +143,11 @@ Permettre de mettre en paramètre d'une fonction de mapping un objet et de setup
 
 ## Sprint 8
 
-**Objectif :**
+### **Objectif :**
 
 Gestion et utilisation de session
 
-**Etapes :**
+### **Etapes :**
 
 * Étape 1:
 
@@ -157,3 +157,19 @@ Gestion et utilisation de session
 * Étape 2 :
 
   * A l'appel des méthodes des controllers de l’utilisateur, pendant la génération des arguments, vérifier si le paramètre est de type MySession et dans ce cas, créer un MySession avec req.getSession()
+
+## Sprint 9
+
+### Objectif :
+
+Exposition des actions du controller em REST API
+
+### Etapes :
+
+* Creer classe annotation RestAPI
+* Dans FrontServlet, verification de l'axistence de l'annotation
+  * Si annotation n'existe pas --> continuer comme avant
+  * Si oui
+    * Recuperer la valeur de retour  du methode
+      * Si ModelView, transformation en Json de la valeur de l'attribut data
+      * Sinon, transformation en Json directement
