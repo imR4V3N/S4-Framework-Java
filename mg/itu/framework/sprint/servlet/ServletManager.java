@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.google.gson.Gson;
 import com.thoughtworks.paranamer.AdaptiveParanamer;
 import com.thoughtworks.paranamer.Paranamer;
 import jakarta.servlet.RequestDispatcher;
@@ -20,6 +21,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import mg.itu.framework.sprint.annotation.Controller;
 import mg.itu.framework.sprint.annotation.Get;
 import mg.itu.framework.sprint.annotation.RequestParam;
+import mg.itu.framework.sprint.annotation.RestAPI;
 import mg.itu.framework.sprint.utils.Utils;
 import mg.itu.framework.sprint.utils.Mapping;
 import mg.itu.framework.sprint.exception.*;
@@ -138,37 +140,6 @@ public class ServletManager {
         dispatcher.forward(request,response);
     }
 
-    public static void executeMethod (String packageCtrl, Mapping map, HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException, IOException , Exception {
-        PrintWriter out = response.getWriter();
-        
-        Class<?> clazz = Class.forName(packageCtrl+"."+map.getClassName());
-        Method method = Utils.getMethodAnnotedGet(clazz,map.getMethodName());
-        Object object = clazz.newInstance();
-        addSession(object, request);
-        
-        if (method.getReturnType() == String.class || method.getReturnType() == ModelView.class){
-            List<Object> MethodParameters = new ArrayList<>();
-
-            if (method.getParameters().length > 0) {
-                MethodParameters = preparedParameter(object, method,request,response);
-
-                if (MethodParameters.size() != method.getParameters().length) {
-                    throw new Exception("Parameters number is insufficient!");
-                }
-            }
-            if (method.getReturnType() == String.class){
-                out.println("Method return : "+ method.invoke(object, MethodParameters.toArray(new Object[]{})).toString());
-            }
-            if (method.getReturnType() == ModelView.class){
-                dispatchModelView((ModelView) method.invoke(object, MethodParameters.toArray(new Object[]{})), request, response);
-            }
-        }
-
-        else {
-            throw new Exception("The return type of the method " + method.getName() + " in " + clazz.getName() + ".class is invalid!");
-        }
-    }
-
     public static List<Object> preparedParameter(Object obj, Method method, HttpServletRequest request, HttpServletResponse response) throws Exception {
         List<Object> result = new ArrayList<>();
         Parameter [] parameters = method.getParameters();
@@ -218,6 +189,59 @@ public class ServletManager {
             }
         }
         return obj;
+    }
+
+    public static void returnJson(Object obj, Method method, HttpServletResponse response) throws Exception {
+        PrintWriter out = response.getWriter();
+        Gson gson = new Gson();
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        if (method.getReturnType() == ModelView.class) {
+            ModelView modelView = (ModelView) obj;
+            for(Map.Entry<String,Object> data : modelView.getData().entrySet()){
+                String jsonValue = gson.toJson(data.getValue());
+                out.println(jsonValue);
+            }
+        } else {
+            String jsonValue = gson.toJson(obj);
+            out.println(jsonValue);
+        }
+    }
+
+    public static void executeMethod (String packageCtrl, Mapping map, HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException, IOException , Exception {
+        PrintWriter out = response.getWriter();
+        
+        Class<?> clazz = Class.forName(packageCtrl+"."+map.getClassName());
+        Method method = Utils.getMethodAnnotedGet(clazz,map.getMethodName());
+        Object object = clazz.newInstance();
+        addSession(object, request);
+        
+        List<Object> methodParameters = new ArrayList<>();
+
+        if (method.getParameters().length > 0) {
+            methodParameters = preparedParameter(object, method,request,response);
+
+            if (methodParameters.size() != method.getParameters().length) {
+                throw new Exception("Parameters number is insufficient!");
+            }
+        }
+
+        if (method.isAnnotationPresent(RestAPI.class)) {
+            Object obj = method.invoke(object, methodParameters.toArray(new Object[]{}));
+            returnJson(obj, method, response);
+        } else {
+            if (method.getReturnType() == String.class){
+                out.println("Method return : "+ method.invoke(object, methodParameters.toArray(new Object[]{})).toString());
+            }
+            if (method.getReturnType() == ModelView.class){
+                dispatchModelView((ModelView) method.invoke(object, methodParameters.toArray(new Object[]{})), request, response);
+            }
+    
+            else {
+                throw new Exception("The return type of the method " + method.getName() + " in " + clazz.getName() + ".class is invalid!");
+            }
+        }
     }
 
 }
