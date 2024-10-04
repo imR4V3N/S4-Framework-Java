@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import mg.itu.framework.sprint.utils.Mapping;
+import mg.itu.framework.sprint.exception.VerbException;
 import mg.itu.framework.sprint.servlet.ServletManager;
 
 public class FrontController  extends HttpServlet{
@@ -75,27 +76,31 @@ public class FrontController  extends HttpServlet{
         }
     }
 
-    public void processExecuteMethod(String url, String packageCtrl, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
+    public void processExecuteMethod(String url, String packageCtrl, HttpServletRequest request, HttpServletResponse response, String verb) throws IOException, ServletException{
         PrintWriter out = response.getWriter();
         try {
             Mapping map = ServletManager.getUrl(this.getControllerAndMethod(), url);
-            out.println("Controller Name : " + map.getClassName());
-            out.println("Method Name : " + map.getMethodName());
-            ServletManager.executeMethod(packageCtrl, map, request, response);
+            if (verb.equals(map.getVerb())) {
+                out.println("Controller Name : " + map.getClassName());
+                out.println("Method Name : " + map.getMethodName());
+                ServletManager.executeMethod(packageCtrl, map, request, response);
+            } else {
+                throw new VerbException();
+            }
 
         } catch (Exception e) {
             out.println("Error : " + e.getMessage());
         }
     }
 
-    public void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
+    public void processRequest(HttpServletRequest request, HttpServletResponse response, String verb) throws IOException, ServletException{
         PrintWriter out = response.getWriter();
         String packageCtrl = this.getInitParameter("packageName");
         String url =  request.getRequestURI();
         out.println("URL : " + url);
 
         try {
-            this.processExecuteMethod(url, packageCtrl, request, response);
+            this.processExecuteMethod(url, packageCtrl, request, response, verb);
         } catch (Exception e) {
             out.println("Error : " + e.getMessage());
         }
@@ -103,10 +108,10 @@ public class FrontController  extends HttpServlet{
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
-        this.processRequest(request,response);
+        this.processRequest(request,response, "Get");
     }
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
-        this.processRequest(request,response);
+        this.processRequest(request,response, "Post");
     }
 }
