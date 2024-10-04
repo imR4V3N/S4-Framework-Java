@@ -173,3 +173,17 @@ Exposition des actions du controller em REST API
     * Recuperer la valeur de retour  du methode
       * Si ModelView, transformation en Json de la valeur de l'attribut data
       * Sinon, transformation en Json directement
+
+## Sprint 10
+
+### Objectif :
+
+Récupérer la classe et la méthode associées à une URL donnée (Suite)
+
+### Etapes :
+
+* Creation d'une nouvelle annotation POST et d'une annotation URL qui va conserver l'url et enlever la valeur de l'url dans GET
+* Si la methode n'est ni annote GET ou POST, on utilise GET par defaut
+* Savoir si la methode est annote GET ou POST et l'url dependra de cela
+* Ajouter un attribut VERB dans Mapping qui sera definit en GET ou POST
+* Si la methode d'appelle de l'url est different de l'annotation de la methode dans la classe controller, une exception sera leve
