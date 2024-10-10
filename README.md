@@ -116,7 +116,7 @@ Envoyer des donnees du view vers controller
 
 ### Etapes:
 
-* Creation d'une annotation RequestParam pour annoter les attrubuts d'une methode dans un controller
+* Creation d'une annotation RequestParam pour annoter les attributs d'une methode dans un controller
 * Dans FrontController
   * Comparaison si le nom du parametre du formulaire correspond a l'anotation du parametre de methode correspondant a l'url
     * Si oui, assignation de la valeur du parametre du formulaire dans le parametre de la methode
@@ -156,7 +156,7 @@ Gestion et utilisation de session
   - Ajouter fonctions get(String key), add(String key, Object objet), delete(String key)
 * Étape 2 :
 
-  * A l'appel des méthodes des controllers de l’utilisateur, pendant la génération des arguments, vérifier si le paramètre est de type MySession et dans ce cas, créer un MySession avec req.getSession()
+  * A l'appel des méthodes des controllers de l'utilisateur, pendant la génération des arguments, vérifier si le paramètre est de type MySession et dans ce cas, créer un MySession avec req.getSession()
 
 ## Sprint 9
 
@@ -173,3 +173,28 @@ Exposition des actions du controller em REST API
     * Recuperer la valeur de retour  du methode
       * Si ModelView, transformation en Json de la valeur de l'attribut data
       * Sinon, transformation en Json directement
+
+## Sprint 10
+
+### Objectif :
+
+Récupérer la classe et la méthode associées à une URL donnée (Suite)
+
+### Etapes :
+
+* Creation d'une nouvelle annotation POST et d'une annotation URL qui va conserver l'url et enlever la valeur de l'url dans GET
+* Si la methode n'est ni annote GET ou POST, on utilise GET par defaut
+* Savoir si la methode est annote GET ou POST et l'url dependra de cela
+* Creer une classe VerbAction qui aura comme attibut VERB et METHODNAME pour pouvoir permettre a 2 methodes differentes d'avoir le meme url mais avec differents verb
+* Ajouter une list de VerbAction dans Mapping
+* Si la methode d'appelle de l'url est different de l'annotation de la methode dans la classe controller, une exception sera leve
+
+## Sprint 11
+
+### Objectif :
+
+Gestion d'exception dans une page web
+
+### Etapes :
+
+Afficher les exceptions gerer precedement dans le Sprint 5 dans une page web sous forme de String en utilisant response.getWriter() et response.setContentType("text/html")

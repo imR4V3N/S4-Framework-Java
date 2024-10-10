@@ -19,10 +19,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import mg.itu.framework.sprint.annotation.Controller;
-import mg.itu.framework.sprint.annotation.Get;
+import mg.itu.framework.sprint.annotation.Url;
 import mg.itu.framework.sprint.annotation.RequestParam;
 import mg.itu.framework.sprint.annotation.RestAPI;
 import mg.itu.framework.sprint.utils.Utils;
+import mg.itu.framework.sprint.utils.VerbAction;
 import mg.itu.framework.sprint.utils.Mapping;
 import mg.itu.framework.sprint.exception.*;
 
@@ -49,13 +50,23 @@ public class ServletManager {
             for(Class<?> classe : classes) {
                 ArrayList<Method> methods = Utils.getListMethod(classe);
                 for (Method method : methods) {
-                    if (method.isAnnotationPresent(Get.class)) {
-                        String url = ((Get) method.getAnnotation(Get.class)).value();
-                        if (result.get(url)==null) {
-                            Mapping mapping = new Mapping(classe.getSimpleName(),method.getName());
+                    if (method.isAnnotationPresent(Url.class)) {
+                        String verb = Utils.getVerb(method);
+
+                        String url = ((Url) method.getAnnotation(Url.class)).value();
+                        Mapping map = result.get(url);
+                        
+                        if (map == null) {
+                            Mapping mapping = new Mapping(classe.getSimpleName());
+                            mapping.addVerbAction(new VerbAction(method.getName(), verb));
                             result.put(url, mapping);
                         } else {
-                            throw new DuplicateException();
+                            VerbAction verbAction = new VerbAction(method.getName(), verb);
+                            if (!Utils.isVerbExistInMapping(map, verbAction)) {
+                                map.addVerbAction(verbAction);
+                            } else {
+                                throw new DuplicateException();
+                            }
                         }
                     }
                 }
@@ -101,12 +112,12 @@ public class ServletManager {
         }
     }
 
-    public static void executeMethodController(String url, HttpServletRequest request, HttpServletResponse response, String packageName, HashMap<String,Mapping> controllerAndMethod) throws Exception {
+    public static void executeMethodController(String url, VerbAction verbAction,HttpServletRequest request, HttpServletResponse response, String packageName, HashMap<String,Mapping> controllerAndMethod) throws Exception {
         PrintWriter out = response.getWriter();        
         Mapping map = ServletManager.getUrl(controllerAndMethod, url);
 
         String className = map.getClassName();
-        String methodName = map.getMethodName();
+        String methodName = verbAction.getMethod();
         String classPath = packageName + "." + className;
         
         Class<?> controllerClass = Class.forName(classPath);
@@ -209,11 +220,11 @@ public class ServletManager {
         }
     }
 
-    public static void executeMethod (String packageCtrl, Mapping map, HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException, IOException , Exception {
+    public static void executeMethod (String packageCtrl, Mapping map, VerbAction verbAction, HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException, IOException , Exception {
         PrintWriter out = response.getWriter();
         
         Class<?> clazz = Class.forName(packageCtrl+"."+map.getClassName());
-        Method method = Utils.getMethodAnnotedGet(clazz,map.getMethodName());
+        Method method = Utils.getMethodAnnoted(clazz, verbAction.getMethod());
         Object object = clazz.newInstance();
         addSession(object, request);
         
@@ -234,10 +245,9 @@ public class ServletManager {
             if (method.getReturnType() == String.class){
                 out.println("Method return : "+ method.invoke(object, methodParameters.toArray(new Object[]{})).toString());
             }
-            if (method.getReturnType() == ModelView.class){
+            else if (method.getReturnType() == ModelView.class){
                 dispatchModelView((ModelView) method.invoke(object, methodParameters.toArray(new Object[]{})), request, response);
             }
-    
             else {
                 throw new Exception("The return type of the method " + method.getName() + " in " + clazz.getName() + ".class is invalid!");
             }
