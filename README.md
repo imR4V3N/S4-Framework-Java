@@ -185,5 +185,16 @@ Récupérer la classe et la méthode associées à une URL donnée (Suite)
 * Creation d'une nouvelle annotation POST et d'une annotation URL qui va conserver l'url et enlever la valeur de l'url dans GET
 * Si la methode n'est ni annote GET ou POST, on utilise GET par defaut
 * Savoir si la methode est annote GET ou POST et l'url dependra de cela
-* Ajouter un attribut VERB dans Mapping qui sera definit en GET ou POST
+* Creer une classe VerbAction qui aura comme attibut VERB et METHODNAME pour pouvoir permettre a 2 methodes differentes d'avoir le meme url mais avec differents verb
+* Ajouter une list de VerbAction dans Mapping
 * Si la methode d'appelle de l'url est different de l'annotation de la methode dans la classe controller, une exception sera leve
+
+## Sprint 11
+
+### Objectif :
+
+Gestion d'exception dans une page web
+
+### Etapes :
+
+Afficher les exceptions gerer precedement dans le Sprint 5 dans une page web sous forme de String en utilisant response.getWriter() et response.setContentType("text/html")
