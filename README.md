@@ -198,3 +198,14 @@ Gestion d'exception dans une page web
 ### Etapes :
 
 Afficher les exceptions gerer precedement dans le Sprint 5 dans une page web sous forme de String en utilisant response.getWriter() et response.setContentType("text/html")
+
+## Sprint 12
+
+### Objectif : 
+
+Permettre la recuperation de fichier par formulaire
+
+### Etapes :
+
+* Annoter par l'annotation @MultipartConfig la classe FrontController
+* Dans la methode preparedParameter ajouter une condition que si le parametre de la methode du controller est de type Part alors au lieu de request.getParameter on recupere la valeur par request.getPart
