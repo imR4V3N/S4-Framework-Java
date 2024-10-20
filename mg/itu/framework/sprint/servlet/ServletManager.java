@@ -18,6 +18,7 @@ import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 import mg.itu.framework.sprint.annotation.Controller;
 import mg.itu.framework.sprint.annotation.Url;
 import mg.itu.framework.sprint.annotation.RequestParam;
@@ -169,7 +170,10 @@ public class ServletManager {
                 Session session = new Session(request.getSession());
                 result.add(session);
             }
-            if (Utils.isObject(clazz) && clazz != Session.class){
+            if(clazz == Part.class){
+                result.add(request.getPart(argumentName));
+            }
+            if (Utils.isObject(clazz) && clazz != Session.class && clazz != Part.class){
                 Object o = clazz.newInstance();
                 result.add(prepareObject(argumentName,o,request));
             }
