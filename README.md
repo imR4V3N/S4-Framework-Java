@@ -201,7 +201,7 @@ Afficher les exceptions gerer precedement dans le Sprint 5 dans une page web sou
 
 ## Sprint 12
 
-### Objectif : 
+### Objectif :
 
 Permettre la recuperation de fichier par formulaire
 
@@ -209,3 +209,14 @@ Permettre la recuperation de fichier par formulaire
 
 * Annoter par l'annotation @MultipartConfig la classe FrontController
 * Dans la methode preparedParameter ajouter une condition que si le parametre de la methode du controller est de type Part alors au lieu de request.getParameter on recupere la valeur par request.getPart
+
+## Sprint 13
+
+### Objectif : 
+
+Validation de formulaire
+
+### Etapes : 
+
+* Creer des annotations d'attribut de validations comme @Required, @Numeric, @Mail, @Date
+* Si un attribut est annote par l'un ou plusieurs de ces annotations mais que les valeurs venant du formulaire ne correspond pas selon l'annotation par exemple si un attribut est annote @Required alors que la valeur du formulaire est vide une exception sera levee

@@ -152,6 +152,50 @@ public class ServletManager {
         dispatcher.forward(request,response);
     }
 
+    public static String [] getParameterName(Method method){
+        Paranamer paranamer = new AdaptiveParanamer();
+        String [] parameterName = paranamer.lookupParameterNames(method);
+        return  parameterName;
+    }
+
+    public static Object prepareObject (String name, Object object, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Field[] attributs = object.getClass().getDeclaredFields();
+        ValidationManager checker = new ValidationManager();
+        for (Field attribut : attributs){
+            
+            String method_name = "set" + Utils.toUpperCase(attribut.getName());
+            Method method = object.getClass().getDeclaredMethod(method_name, attribut.getType());
+            String input_name = name + ":" + attribut.getName();
+            String value = request.getParameter(input_name); 
+
+            if(value != null){
+                if (checker.isValid(attribut, value)) {
+                    method.invoke(object, Utils.castValue(value, attribut.getType()));
+                }
+            }
+        }
+        return object;
+    }
+
+    public static void returnJson(Object obj, Method method, HttpServletResponse response) throws Exception {
+        PrintWriter out = response.getWriter();
+        Gson gson = new Gson();
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        if (method.getReturnType() == ModelView.class) {
+            ModelView modelView = (ModelView) obj;
+            for(Map.Entry<String,Object> data : modelView.getData().entrySet()){
+                String jsonValue = gson.toJson(data.getValue());
+                out.println(jsonValue);
+            }
+        } else {
+            String jsonValue = gson.toJson(obj);
+            out.println(jsonValue);
+        }
+    }
+
+    
     public static List<Object> preparedParameter(Object obj, Method method, HttpServletRequest request, HttpServletResponse response) throws Exception {
         List<Object> result = new ArrayList<>();
         Parameter [] parameters = method.getParameters();
@@ -175,53 +219,18 @@ public class ServletManager {
             }
             if (Utils.isObject(clazz) && clazz != Session.class && clazz != Part.class){
                 Object o = clazz.newInstance();
-                result.add(prepareObject(argumentName,o,request));
+                result.add(prepareObject(argumentName, o, request, response));
             }
             if (!Utils.isObject(clazz)) {
+                
                 if(request.getParameter(argumentName)!=null){
                     result.add(Utils.castValue(request.getParameter(argumentName),parameters[i].getType()));
+                
                 }
             }
         }
 
         return result;
-    }
-
-    public static String [] getParameterName(Method method){
-        Paranamer paranamer = new AdaptiveParanamer();
-        String [] parameterName = paranamer.lookupParameterNames(method);
-        return  parameterName;
-    }
-
-    public static Object prepareObject (String name, Object obj, HttpServletRequest request) throws Exception {
-        Field[] attributs = obj.getClass().getDeclaredFields();
-        for (Field attr : attributs){
-            String method_name = "set"+Utils.toUpperCase(attr.getName());
-            Method method = obj.getClass().getDeclaredMethod(method_name,attr.getType());
-            String input_name = name+":"+attr.getName();
-            if(request.getParameter(input_name)!=null){
-                method.invoke(obj,Utils.castValue(request.getParameter(input_name),attr.getType()));
-            }
-        }
-        return obj;
-    }
-
-    public static void returnJson(Object obj, Method method, HttpServletResponse response) throws Exception {
-        PrintWriter out = response.getWriter();
-        Gson gson = new Gson();
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
-        if (method.getReturnType() == ModelView.class) {
-            ModelView modelView = (ModelView) obj;
-            for(Map.Entry<String,Object> data : modelView.getData().entrySet()){
-                String jsonValue = gson.toJson(data.getValue());
-                out.println(jsonValue);
-            }
-        } else {
-            String jsonValue = gson.toJson(obj);
-            out.println(jsonValue);
-        }
     }
 
     public static void executeMethod (String packageCtrl, Mapping map, VerbAction verbAction, HttpServletRequest request, HttpServletResponse response) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException, IOException , Exception {
@@ -233,9 +242,9 @@ public class ServletManager {
         addSession(object, request);
         
         List<Object> methodParameters = new ArrayList<>();
-
+        
         if (method.getParameters().length > 0) {
-            methodParameters = preparedParameter(object, method,request,response);
+            methodParameters = preparedParameter(object, method,request, response);
 
             if (methodParameters.size() != method.getParameters().length) {
                 throw new Exception("Parameters number is insufficient!");
@@ -245,6 +254,7 @@ public class ServletManager {
         if (method.isAnnotationPresent(RestAPI.class)) {
             Object obj = method.invoke(object, methodParameters.toArray(new Object[]{}));
             returnJson(obj, method, response);
+
         } else {
             if (method.getReturnType() == String.class){
                 out.println("Method return : "+ method.invoke(object, methodParameters.toArray(new Object[]{})).toString());
@@ -255,6 +265,7 @@ public class ServletManager {
             else {
                 throw new Exception("The return type of the method " + method.getName() + " in " + clazz.getName() + ".class is invalid!");
             }
+
         }
     }
 
