@@ -92,14 +92,14 @@ public class Utils {
         if(clazz == String.class){
             result = value;
         }
-        if(clazz == Integer.class){
+        if(clazz == Integer.class || clazz == int.class){
            try {
                 result = Integer.valueOf(value);
            } catch(RuntimeException e) {
                 throw new CastException("Can't cast Text to Integer!");
            }
         }
-        if(clazz == Double.class){
+        if(clazz == Double.class || clazz == double.class){
             try {
                 result = Double.valueOf(value);
             } catch (RuntimeException e) {
@@ -144,5 +144,20 @@ public class Utils {
             }
         }
         return verbAction;
+    }
+
+    public static boolean isNumeric(String value) {
+        return value.matches("-?\\d+(\\.\\d+)?");
+    }
+
+    public static boolean isDate(String value) {
+        boolean result = false;
+        try {
+            java.sql.Date.valueOf(value);
+            result = true;
+        }catch (RuntimeException e){
+            result = false;
+        }
+        return result;
     }
 }
