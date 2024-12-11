@@ -1,5 +1,32 @@
 # **SPRINT FRAMEWORK - ETU002476**
 
+**Voici la configuration de web.xml pour les projets avec ce framework**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                             http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+    <servlet>
+        <servlet-name>FrontController</servlet-name>
+        <servlet-class>mg.framework.controller.FrontController</servlet-class>
+        <load-on-startup>1</load-on-startup>
+        <init-param>
+            <param-name>package_name</param-name>
+            <param-value>controller</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>FrontController</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+</web-app>
+```
+
 ## Sprint 0
 
 **Objectif:** Créer un servlet qui réceptionnera toutes les requêtes clients et qui les traitera
@@ -212,11 +239,23 @@ Permettre la recuperation de fichier par formulaire
 
 ## Sprint 13
 
-### Objectif : 
+### Objectif :
 
 Validation de formulaire
 
-### Etapes : 
+### Etapes :
 
 * Creer des annotations d'attribut de validations comme @Required, @Numeric, @Mail, @Date
 * Si un attribut est annote par l'un ou plusieurs de ces annotations mais que les valeurs venant du formulaire ne correspond pas selon l'annotation par exemple si un attribut est annote @Required alors que la valeur du formulaire est vide une exception sera levee
+
+## Sprint 14
+
+### Objectif :
+
+Validation de formulaire
+
+### Etapes :
+
+* Creer des annotations d'attribut de validations comme @Required, @Numeric, @Mail, @Date
+* Si un attribut est annote par l'un ou plusieurs de ces annotations mais que les valeurs venant du formulaire ne correspond pas selon l'annotation par exemple si un attribut est annote @Required alors que la valeur du formulaire est vide une erreur sera retourner au dessus de l'input correspondant et les valeurs valident seront aussi retourner sur l'input correspondant
+  * Cela se fait par les fonctions ValidationManager.error(nom_de_input) et ValidationManager.value(nom_de_input)
