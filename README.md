@@ -273,3 +273,18 @@ Authentification au niveau methode
 * Comparer le niveau d'authentification de la methode avec le niveau d'authentification du client
   * Si le niveau d'authentification de la methode est inferieur ou egale au niveau d'authentification du client alors la methode est accessible au client
   * Sinon une exception sera leve que la methode n'est pas accessible au client
+
+
+## Sprint 16
+
+### Objectif :
+
+Authentification au niveau classe (Controller ou Model)
+
+### Etapes :
+
+* Creation d'une annotation pour le niveau d'authentification de la classe
+* Creation d'une classe pour l'authentification du client qui sera conserver dans une session
+* Comparer le niveau d'authentification de la classe avec le niveau d'authentification du client
+  * Si le niveau d'authentification de la methode est inferieur ou egale au niveau d'authentification du client alors la classe est accessible au client
+  * Sinon une exception sera leve que la methode n'est pas accessible au client
