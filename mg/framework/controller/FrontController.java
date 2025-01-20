@@ -38,18 +38,20 @@ public class FrontController extends HttpServlet{
     }
 
     public void initController() {
+        ServletManager manager = new ServletManager();
         try {
             String packageCtrl = this.getInitParameter("package_name");
-            this.setClassController(ServletManager.getControllerClasses(packageCtrl));
+            this.setClassController(manager.getControllerClasses(packageCtrl));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void init() throws ServletException{
+        ServletManager manager = new ServletManager();
         this.initController();
         try {
-            HashMap<String,Mapping> map = ServletManager.getControllerMethod(this.getClassController());
+            HashMap<String,Mapping> map = manager.getControllerMethod(this.getClassController());
             
             if (map != null) {
                 this.setControllerAndMethod(map);
@@ -73,7 +75,7 @@ public class FrontController extends HttpServlet{
 
     public void showControllerAndMethod(PrintWriter out, String url) throws Exception{
         try {
-            Mapping map = ServletManager.getUrl(this.getControllerAndMethod(), url);
+            Mapping map = new Mapping().getUrl(this.getControllerAndMethod(), url);
             out.println("Controller Name : " + map.getClassName());
         } catch (Exception e) {
             out.println("Error : " + e.getMessage());
@@ -81,10 +83,10 @@ public class FrontController extends HttpServlet{
     }
 
     public void processExecuteMethod(String url, String packageCtrl, HttpServletRequest request, HttpServletResponse response, String verb) throws IOException, ServletException, Exception{
-        Mapping map = ServletManager.getUrl(this.getControllerAndMethod(), url);
+        Mapping map = new Mapping().getUrl(this.getControllerAndMethod(), url);
         VerbAction verbAction = Utils.checkUrlMethod(map, verb);
         if (verbAction != null) {
-            ServletManager.executeMethod(packageCtrl, map, verbAction,request, response);
+            new ServletManager().executeMethod(packageCtrl, map, verbAction,request, response);
         } else {
             throw new VerbException();
         }

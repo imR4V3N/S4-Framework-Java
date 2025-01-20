@@ -1,4 +1,4 @@
-package mg.framework.servlet;
+package mg.framework.manager;
 
 import java.lang.reflect.Field;
 import jakarta.servlet.http.HttpServletRequest;
@@ -88,21 +88,5 @@ public class ValidationManager {
             result = "<input type='hidden' name='previous_page' value='" + page + "' >";
         } 
         return error + " " + result;
-    }
-
-    public static String error (String field_name, HttpServletRequest request){
-        String error = (String) request.getAttribute("error_"+field_name);
-        if (error == null) { 
-            error = "";
-        }
-        return new ValidationManager().setPreviousPage(error, request);
-    }
-
-    public static String value (String field_name, HttpServletRequest request){
-        String value = (String) request.getAttribute("value_"+field_name);
-        if (value == null) {
-            value = "";
-        }
-        return value;
     }
 }

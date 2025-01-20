@@ -1,8 +1,8 @@
-package mg.framework.annotation;
+package mg.framework.annotation.authentication;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Url {
-    String value();
+public @interface Authentication {
+    int level() default 0;
 }
