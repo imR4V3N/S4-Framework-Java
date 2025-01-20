@@ -259,3 +259,17 @@ Validation de formulaire
 * Creer des annotations d'attribut de validations comme @Required, @Numeric, @Mail, @Date
 * Si un attribut est annote par l'un ou plusieurs de ces annotations mais que les valeurs venant du formulaire ne correspond pas selon l'annotation par exemple si un attribut est annote @Required alors que la valeur du formulaire est vide une erreur sera retourner au dessus de l'input correspondant et les valeurs valident seront aussi retourner sur l'input correspondant
   * Cela se fait par les fonctions ValidationManager.error(nom_de_input) et ValidationManager.value(nom_de_input)
+
+## Sprint 15
+
+### Objectif :
+
+Authentification au niveau methode
+
+### Etapes :
+
+* Creation d'une annotation pour le niveau d'authentification de la methode
+* Creation d'une classe pour l'authentification du client qui sera conserver dans une session
+* Comparer le niveau d'authentification de la methode avec le niveau d'authentification du client
+  * Si le niveau d'authentification de la methode est inferieur ou egale au niveau d'authentification du client alors la methode est accessible au client
+  * Sinon une exception sera leve que la methode n'est pas accessible au client

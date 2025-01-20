@@ -6,9 +6,9 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.sql.Date;
 import java.util.ArrayList;
-import mg.framework.annotation.Get;
-import mg.framework.annotation.Post;
-import mg.framework.annotation.Url;
+import mg.framework.annotation.servlet.Get;
+import mg.framework.annotation.servlet.Post;
+import mg.framework.annotation.servlet.Url;
 import mg.framework.exception.CastException;
 
 public class Utils {
