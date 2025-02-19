@@ -75,10 +75,10 @@ public class Utils {
         if(clazz == String.class){
             return false;
         }
-        if(clazz == Integer.class){
+        if(clazz == Integer.class || clazz == int.class){
             return false;
         }
-        if(clazz == Double.class){
+        if(clazz == Double.class || clazz == double.class){
             return false;
         }
         if(clazz == Date.class){
