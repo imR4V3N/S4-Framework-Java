@@ -14,7 +14,7 @@ import mg.framework.utils.Utils;
 import mg.framework.utils.VerbAction;
 import mg.framework.exception.VerbException;
 import mg.framework.exception.Error;
-import mg.framework.servlet.ServletManager;
+import mg.framework.manager.ServletManager;
 
 @MultipartConfig
 public class FrontController extends HttpServlet{
@@ -101,6 +101,7 @@ public class FrontController extends HttpServlet{
         } catch (Exception e) {
             response.setContentType("text/html");
             out.println(Error.getError(e.getMessage()));
+            e.printStackTrace();
         }
     }
 

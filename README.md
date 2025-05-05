@@ -288,3 +288,20 @@ Authentification au niveau classe (Controller ou Model)
 * Comparer le niveau d'authentification de la classe avec le niveau d'authentification du client
   * Si le niveau d'authentification de la methode est inferieur ou egale au niveau d'authentification du client alors la classe est accessible au client
   * Sinon une exception sera leve que la methode n'est pas accessible au client
+
+
+
+## Sprint 17
+
+### Objectif :
+
+Autres utilitaires
+
+### Etapes :
+
+* Creation d'une annotation pour l'url d'une classe Controller (@BaseUrl)
+* Si une classe est annote @BaseUrl 
+  * Concatenation de la valeur de l'annotation avec celui de la methode associe a la classe Controller
+* Creation d'une classe pour la redirection  
+  * Mettre l'url de redirection dans la classe 
+  * Creer une methode de redirection a appeler pour la redirection dans une page ou dans un controller
