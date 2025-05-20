@@ -1,5 +1,11 @@
 # **SPRINT FRAMEWORK - ETU002476**
 
+**Comment utiliser le framework dans votre projet :**
+- Soit mettre directement le code source dans votre projet
+- Soit utiliser le script **Jat.bat(windows)** ou **Jar.sh(Linux)** pour exporter le code en librairie jar  
+  * Dependances du framework : gson.jar, paranamer-2.8.jar, servlet-api.jar  
+
+
 **Voici la configuration de web.xml pour les projets avec ce framework**
 
 ```xml
