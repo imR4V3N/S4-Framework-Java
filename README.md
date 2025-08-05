@@ -165,7 +165,7 @@ Envoyer des donnees du view vers controller
 
 ### **Objectif:**
 
-Permettre de mettre en paramètre d'une fonction de mapping un objet et de setup ses attributs.
+Permett de passer un objet en paramètre d'une fonction et de parametrer ses attributs.
 
 ### **Etapes:**
 
